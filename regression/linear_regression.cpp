@@ -45,7 +45,7 @@ float mean(float *y, int length){
     return (total/length);
 }
 
-float variance(float *y, int length){
+float sum_of_square(float *y, int length){
     // Not the most efficient way of calculating variance, see : https://www.sciencebuddies.org/science-fair-projects/science-fair/variance-and-standard-deviation 
     float total = 0;
     float residual;
@@ -54,12 +54,16 @@ float variance(float *y, int length){
         residual = (y[i] - y_mean);
         total = total + (residual*residual);
     }
-    return (total/length);
+    return total;
 }
 
 float residual_sum_of_square(float *y_pred, float *y_true, int length){
     float total = 0;
-    
+    float residual;
+    for(int i = 0 ; i < length; i++){
+        residual = (y_true[i] - y_pred[i]);
+        total = total + (residual*residual);
+    }
     return total;
 }
 
