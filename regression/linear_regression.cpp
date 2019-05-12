@@ -74,6 +74,8 @@ int calculate_r2(float *y_pred, float *y_true, int length){
     // mean of observed data (y_mean) = mean(y_true)
     // Sum of squared total = sum from i = 0 to length-1 of (y_true_i - y_pred_i)^2
     // This is similar to variance(y) * length;
+    float sum_squared_residual = residual_sum_of_square(y_pred,y_true,length);
+    float sum_squared_total = sum_of_square(y_true,length);
     return -1;
 }
 
