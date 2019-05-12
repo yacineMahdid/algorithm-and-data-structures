@@ -5,7 +5,7 @@
 #include <cstdlib> 
 
 // Utility Function (TODO: put into another file and import it)
-void read_csv(const char* filename, float **x, float **y){
+int read_csv(const char* filename, float **x, float **y){
     // Variable Initialization
     int index = 0;
     int length = 0;
@@ -32,10 +32,23 @@ void read_csv(const char* filename, float **x, float **y){
     }
     samefile.close();
 
+    return length;
 }
 
+
 // Helper functions for Algorithm
-int calculate_r2(){
+float mean(float *y, int length){
+    float y_total = 0;
+    for(int i = 0; i < length; i++){
+        y_total = y_total + y[i];
+    }
+    return (y_total/length);
+}
+int calculate_r2(float *y_pred, float *y_true, int length){
+    // Taken from: https://en.wikipedia.org/wiki/Coefficient_of_determination
+    // R^2 = 1 - (Sum of Squared Residual / Sum of Squared Total)
+    // residuals (e) = y_true - y_pred
+    // mean of observed data (y_mean) = mean(y_true)
     return -1;
 }
 
@@ -47,10 +60,11 @@ int fit_linear_regression(int data){
 int main(){
     float *x;
     float *y;
+    int length; 
     const char* filename = "test.csv";
-    read_csv(filename,&x,&y);
+    length = read_csv(filename,&x,&y);
 
-    std::cout << y[3];
+    std::cout << length;
 }
 
 // TODO:
