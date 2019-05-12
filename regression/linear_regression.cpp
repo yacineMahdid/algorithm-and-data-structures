@@ -5,7 +5,7 @@
 #include <cstdlib> 
 
 // Utility Function (TODO: put into another file and import it)
-void read_csv(const char* filename, float *x, float *y){
+void read_csv(const char* filename, float **x, float **y){
     // Variable Initialization
     int index = 0;
     int length = 0;
@@ -19,18 +19,19 @@ void read_csv(const char* filename, float *x, float *y){
     infile.close();
 
     // Mallocating space for x and y
-    x = (float *) std::malloc(sizeof(float)*length);
-    y = (float *) std::malloc(sizeof(float)*length);
+    *x = (float *) std::malloc(sizeof(float)*length);
+    *y = (float *) std::malloc(sizeof(float)*length);
 
     // Rereading the file to extract x and y values
     char comma;
-    infile.open(filename,'r')
-    while(std::getline(infile,line)){
+    std::ifstream samefile(filename);
+    while(std::getline(samefile,line)){
         std::stringstream line_stream(line);
-        line_stream >> x[index] >> comma >> y[index];
+        line_stream >> (*x)[index] >> comma >> (*y)[index];
         index++;
     }
-    infile.close();
+    samefile.close();
+
 }
 
 // Helper functions for Algorithm
@@ -44,7 +45,12 @@ int fit_linear_regression(int data){
 }
 
 int main(){
-    read_csv("test.csv",(float*) 1,(float *) 1);
+    float *x;
+    float *y;
+    const char* filename = "test.csv";
+    read_csv(filename,&x,&y);
+
+    std::cout << y[3];
 }
 
 // TODO:
