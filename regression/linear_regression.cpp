@@ -38,17 +38,38 @@ int read_csv(const char* filename, float **x, float **y){
 
 // Helper functions for Algorithm
 float mean(float *y, int length){
-    float y_total = 0;
+    float total = 0;
     for(int i = 0; i < length; i++){
-        y_total = y_total + y[i];
+        total = total + y[i];
     }
-    return (y_total/length);
+    return (total/length);
 }
+
+float variance(float *y, int length){
+    // Not the most efficient way of calculating variance, see : https://www.sciencebuddies.org/science-fair-projects/science-fair/variance-and-standard-deviation 
+    float total = 0;
+    float residual;
+    float y_mean = mean(y,length);
+    for(int i = 0 ; i < length; i++){
+        residual = (y[i] - y_mean);
+        total = total + (residual*residual);
+    }
+    return (total/length);
+}
+
+float residual_sum_of_square(float *y_pred, float *y_true, int length){
+    float total = 0;
+    
+    return total;
+}
+
 int calculate_r2(float *y_pred, float *y_true, int length){
     // Taken from: https://en.wikipedia.org/wiki/Coefficient_of_determination
     // R^2 = 1 - (Sum of Squared Residual / Sum of Squared Total)
     // residuals (e) = y_true - y_pred
     // mean of observed data (y_mean) = mean(y_true)
+    // Sum of squared total = sum from i = 0 to length-1 of (y_true_i - y_pred_i)^2
+    // This is similar to variance(y) * length;
     return -1;
 }
 
@@ -64,7 +85,7 @@ int main(){
     const char* filename = "test.csv";
     length = read_csv(filename,&x,&y);
 
-    std::cout << length;
+    std::cout << mean(x,length);
 }
 
 // TODO:
