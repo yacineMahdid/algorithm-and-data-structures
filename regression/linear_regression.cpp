@@ -1,8 +1,59 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <cstdlib> 
+
+// Utility Function (TODO: put into another file and import it)
+void read_csv(const char* filename, float *x, float *y){
+    // Variable Initialization
+    int index = 0;
+    int length = 0;
+
+    // Reading File to get the number of x and y data points
+    std::ifstream infile(filename);
+    std::string line;
+    while (std::getline(infile, line)){
+        length++;
+    }
+    infile.close();
+
+    // Mallocating space for x and y
+    x = (float *) std::malloc(sizeof(float)*length);
+    y = (float *) std::malloc(sizeof(float)*length);
+
+    // Rereading the file to extract x and y values
+    char comma;
+    infile.open(filename,'r')
+    while(std::getline(infile,line)){
+        std::stringstream line_stream(line);
+        line_stream >> x[index] >> comma >> y[index];
+        index++;
+    }
+    infile.close();
+}
+
+// Helper functions for Algorithm
+int calculate_r2(){
+    return -1;
+}
+
+// This use Mean Square Error
+int fit_linear_regression(int data){
+    return -1;
+}
 
 int main(){
-    std::cout << "Result" << "\n";
+    read_csv("test.csv",(float*) 1,(float *) 1);
 }
+
+// TODO:
+// Q: What types of data do we want to fit?
+// A: Because this is linear regression we want to have a vector 'x' witht their corresponding 'y'
+// This will be read from a CSV file
+// Q: What type of output do we want for this function?
+// A csv file with all the weight for the parameters
+
 
 // NOTES:
 // Following this tutorial:
@@ -30,3 +81,5 @@ int main(){
 // new_a1 = a1 - (2a/n)* (Sum (y_predi - yi)*xi from i = 1 to n)
 
 // How to calculate score (R2 score)
+// Read more over here: https://en.wikipedia.org/wiki/Coefficient_of_determination
+// Definition is:  proportion of the variance in the dependent variable that is predictable from the independent variable(s)
