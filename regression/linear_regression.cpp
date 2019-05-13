@@ -90,7 +90,7 @@ float intercept_sum(float *y_pred, float *y_true, int length){
     float total = 0;
     float residual;
     for(int i = 0 ; i < length; i++){
-        residual = (y_true[i] - y_pred[i]);
+        residual = (y_pred[i] - y_true[i]);
         total = total + residual;
     }
     return total;
@@ -100,13 +100,18 @@ float slope_sum(float *x, float *y_pred, float *y_true, int length){
     float total = 0;
     float residual;
     for(int i = 0 ; i < length; i++){
-        residual = (y_true[i] - y_pred[i]);
+        residual = (y_pred[i] - y_true[i]);
         total = total + residual*x[i];
     }
     return total;
 }
 
 void update(float *x, float *y_true, float *y_pred, float *weights, float learning_rate, int length){
+    // How to update
+    // a -> learning rate
+    // new_a0 = a0 - (2a/n)* (Sum (y_predi - yi) from i = 1 to n)
+    // new_a1 = a1 - (2a/n)* (Sum (y_predi - yi)*xi from i = 1 to n)
+    
     float multiplier = 2*learning_rate/length;
     // update the intercept
     weights[0] = weights[0] - multiplier*(intercept_sum(y_pred,y_true,length));
@@ -121,12 +126,14 @@ float* linear_regression(float *x, float *y, int length){
     float *y_pred = (float *) std::malloc(sizeof(float)*length);
     // Here we will use gradient descent to find the best fit
     int max_epoch_left = 10000;
-    float learning_rate = 0.01;
+    float learning_rate = 0.001;
     weights[0] = 0; // intercept
     weights[1] = 0; // slope
     while(max_epoch_left > 0){
         fit(x,weights,y_pred,length);
         update(x, y, y_pred, weights, learning_rate, length);
+        float mse = mean_squared_error(y_pred,y,length);
+        std::cout << mse << "\n";
         max_epoch_left--;
     }
     free(y_pred);
@@ -139,8 +146,8 @@ int main(){
     int length; 
     const char* filename = "test.csv";
     length = read_csv(filename,&x,&y);
-    linear_regression(x,y,length);
-    std::cout << mean(x,length);
+    float *weights = linear_regression(x,y,length);
+    std::cout << "y = " << weights[1] << "x + " << weights[0]  << "\n";
 }
 
 // NOTES:
