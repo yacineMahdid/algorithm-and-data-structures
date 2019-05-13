@@ -69,19 +69,29 @@ float residual_sum_of_square(float *y_pred, float *y_true, int length){
 
 int calculate_r2(float *y_pred, float *y_true, int length){
     // Taken from: https://en.wikipedia.org/wiki/Coefficient_of_determination
-    // R^2 = 1 - (Sum of Squared Residual / Sum of Squared Total)
-    // residuals (e) = y_true - y_pred
-    // mean of observed data (y_mean) = mean(y_true)
-    // Sum of squared total = sum from i = 0 to length-1 of (y_true_i - y_pred_i)^2
-    // This is similar to variance(y) * length;
     float sum_squared_residual = residual_sum_of_square(y_pred,y_true,length);
     float sum_squared_total = sum_of_square(y_true,length);
-    return -1;
+    return (1 - ((sum_squared_residual/sum_squared_total)));
+}
+
+float mean_squared_error(float *y_pred, float *y_true, int length){
+    return residual_sum_of_square(y_pred,y_true,length)/length;
 }
 
 // This use Mean Square Error
-int fit_linear_regression(int data){
-    return -1;
+float* fit_linear_regression(float *x, float *y){
+    // This function will return an array of 2 items (intercept and slope)
+    float *weights = (float *) std::malloc(sizeof(float)*2);
+
+    // Here we will use gradient descent to find the best fit
+    int max_epoch_left = 10000;
+    float learning_rate = 0.01;
+    while(max_epoch_left > 0){
+
+        max_epoch_left--;
+    }
+
+    return weights;
 }
 
 int main(){
@@ -93,14 +103,6 @@ int main(){
 
     std::cout << mean(x,length);
 }
-
-// TODO:
-// Q: What types of data do we want to fit?
-// A: Because this is linear regression we want to have a vector 'x' witht their corresponding 'y'
-// This will be read from a CSV file
-// Q: What type of output do we want for this function?
-// A csv file with all the weight for the parameters
-
 
 // NOTES:
 // Following this tutorial:
