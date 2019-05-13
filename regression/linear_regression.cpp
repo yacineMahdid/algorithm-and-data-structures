@@ -86,21 +86,50 @@ void fit(float *x, float *weights, float *y_pred, int length){
     }
 }
 
+float intercept_sum(float *y_pred, float *y_true, int length){
+    float total = 0;
+    float residual;
+    for(int i = 0 ; i < length; i++){
+        residual = (y_true[i] - y_pred[i]);
+        total = total + residual;
+    }
+    return total;
+}
+
+float slope_sum(float *x, float *y_pred, float *y_true, int length){
+    float total = 0;
+    float residual;
+    for(int i = 0 ; i < length; i++){
+        residual = (y_true[i] - y_pred[i]);
+        total = total + residual*x[i];
+    }
+    return total;
+}
+
+void update(float *x, float *y_true, float *y_pred, float *weights, float learning_rate, int length){
+    float multiplier = 2*learning_rate/length;
+    // update the intercept
+    weights[0] = weights[0] - multiplier*(intercept_sum(y_pred,y_true,length));
+    // update the slope
+    weights[1] = weights[1] - multiplier*(slope_sum(x,y_pred,y_true,length));
+}
+
 // This use Mean Square Error
-float* linear_regression(float *x, float *y, int lenght){
+float* linear_regression(float *x, float *y, int length){
     // This function will return an array of 2 items (intercept and slope)
     float *weights = (float *) std::malloc(sizeof(float)*2);
-    float *y_pred = (float *) std::malloc(sizeof(float)*lenght);
+    float *y_pred = (float *) std::malloc(sizeof(float)*length);
     // Here we will use gradient descent to find the best fit
     int max_epoch_left = 10000;
     float learning_rate = 0.01;
     weights[0] = 0; // intercept
     weights[1] = 0; // slope
     while(max_epoch_left > 0){
-        
+        fit(x,weights,y_pred,length);
+        update(x, y, y_pred, weights, learning_rate, length);
         max_epoch_left--;
     }
-
+    free(y_pred);
     return weights;
 }
 
@@ -110,7 +139,7 @@ int main(){
     int length; 
     const char* filename = "test.csv";
     length = read_csv(filename,&x,&y);
-
+    linear_regression(x,y,length);
     std::cout << mean(x,length);
 }
 
