@@ -78,16 +78,26 @@ float mean_squared_error(float *y_pred, float *y_true, int length){
     return residual_sum_of_square(y_pred,y_true,length)/length;
 }
 
+// fit a line given some x and weights
+void fit(float *x, float *weights, float *y_pred, int length){
+    
+    for(int i = 0; i < length; i++){
+        y_pred[i] = weights[0] + weights[1]*x[i];
+    }
+}
+
 // This use Mean Square Error
-float* fit_linear_regression(float *x, float *y){
+float* linear_regression(float *x, float *y, int lenght){
     // This function will return an array of 2 items (intercept and slope)
     float *weights = (float *) std::malloc(sizeof(float)*2);
-
+    float *y_pred = (float *) std::malloc(sizeof(float)*lenght);
     // Here we will use gradient descent to find the best fit
     int max_epoch_left = 10000;
     float learning_rate = 0.01;
+    weights[0] = 0; // intercept
+    weights[1] = 0; // slope
     while(max_epoch_left > 0){
-
+        
         max_epoch_left--;
     }
 
