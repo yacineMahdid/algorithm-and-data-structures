@@ -5,7 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <cstdlib> 
+#include <cstdlib>
+#include <cstring>
 
 int read_csv(const char* filename, float **x, float **y);
 float mean(float *y, int length);
