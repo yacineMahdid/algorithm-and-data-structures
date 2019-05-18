@@ -78,6 +78,7 @@ int main(){
     float *y;
     int length_train;
     const char* filename = "test.csv";
+    std::cout << "Reading CSV \n";
     Dataset data = read_csv(filename,&X,&y);
 
     // Regression Variables
@@ -85,9 +86,12 @@ int main(){
     float learning_rate = 0.1;
 
     // Training
+    std::cout << "Making LinearRegressionModel \n";
     LinearRegressionModel linear_reg = LinearRegressionModel(data);
+    std::cout << "Training \n";
     linear_reg.train(max_iteration, learning_rate);
     
+    std::cout << "Testing \n";
     // Testing
     float X_test[2];
     X_test[0] = 1;

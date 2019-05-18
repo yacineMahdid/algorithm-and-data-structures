@@ -11,12 +11,13 @@
 
 #include "Dataset.h"
 
-#include "Weights.h";
+#include "Weights.h"
 
 Dataset read_csv(const char* filename, float ***X, float **y);
 int make_csv(const char* filename, Weights weights);
 float mean(float *y, int length);
 float sum_of_square(float *y, int length);
+float sum_residual(float *x, float *y_true, float *y_pred, int length);
 float residual_sum_of_square(float *y_pred, float *y_true, int length);
 int calculate_r2(float *y_pred, float *y_true, int length);
 float mean_squared_error(float *y_pred, float *y_true, int length);

@@ -20,6 +20,7 @@ Dataset read_csv(const char* filename, float ***X, float **y){
                 if(line[i] == ','){
                     number_predictor++;
                 }
+                i++;
             }
         }
     }
@@ -28,15 +29,14 @@ Dataset read_csv(const char* filename, float ***X, float **y){
     // Mallocating space for X and y
     *X = (float **) malloc(sizeof(float*)*length);
     for(int i = 0; i < length; i++){
-        *X[i] = (float *) malloc(sizeof(float*)*number_predictor);
+        (*X)[i] = (float *) malloc(sizeof(float)*number_predictor);
     }
     *y = (float *) malloc(sizeof(float)*length);
-    
 
     // Rereading the file to extract x and y values
     char comma;
     std::ifstream samefile(filename);
-    int current_index;
+    int current_index = 0;
     while(std::getline(samefile,line)){
 
         std::stringstream line_stream(line);
@@ -44,13 +44,12 @@ Dataset read_csv(const char* filename, float ***X, float **y){
         float number;
         while (line_stream >> number)
         {
-            if (line_stream.peek() == ','){
-                line_stream.ignore();
-            }else if(current_predictor == number_predictor){
-                *y[current_index] = number;
+
+            if(current_predictor == number_predictor){
+                (*y)[current_index] = number;
             }
-            else{
-                *X[current_index][current_predictor] = number;
+            else if(number != ','){
+                (*X)[current_index][current_predictor] = number;
                 current_predictor++;
             }
         }

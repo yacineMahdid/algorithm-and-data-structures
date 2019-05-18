@@ -8,7 +8,7 @@ Dataset::Dataset(){
 Dataset::Dataset(float **X_train,float *y_train, int length_train, int number_predictor_train){
     X = (float **) malloc(sizeof(float*)*length_train);
     for(int i = 0; i < length; i++){
-        X[i] = (float *) malloc(sizeof(float*)*number_predictor_train);
+        X[i] = (float *) malloc(sizeof(float)*number_predictor_train);
         std::memcpy(X[i], X_train[i], sizeof(float)*number_predictor_train);
     }
 
