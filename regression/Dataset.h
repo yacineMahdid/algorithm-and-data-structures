@@ -7,6 +7,8 @@ class Dataset{
 
         Dataset();
         Dataset(float **X_train,float *y_train, int length_train, int number_predictor_train);
-        Dataset(const Dataset &data);
+        void copy(const Dataset &data);
         ~Dataset();
+
+        void print_dataset();
 };

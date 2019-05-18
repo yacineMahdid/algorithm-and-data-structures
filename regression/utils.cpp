@@ -2,8 +2,10 @@
 
 
 // Misc Helper function 
-Dataset read_csv(const char* filename, float ***X, float **y){
+Dataset read_csv(const char* filename){
     // Variable Initialization
+    float **X;
+    float *y;
     int index = 0;
     int length = 0;
     int number_predictor = 0;
@@ -27,11 +29,11 @@ Dataset read_csv(const char* filename, float ***X, float **y){
     infile.close();
 
     // Mallocating space for X and y
-    *X = (float **) malloc(sizeof(float*)*length);
+    X = (float **) malloc(sizeof(float*)*length);
     for(int i = 0; i < length; i++){
-        (*X)[i] = (float *) malloc(sizeof(float)*number_predictor);
+        X[i] = (float *) malloc(sizeof(float)*number_predictor);
     }
-    *y = (float *) malloc(sizeof(float)*length);
+    y = (float *) malloc(sizeof(float)*length);
 
     // Rereading the file to extract x and y values
     char comma;
@@ -44,20 +46,24 @@ Dataset read_csv(const char* filename, float ***X, float **y){
         float number;
         while (line_stream >> number)
         {
-
             if(current_predictor == number_predictor){
-                (*y)[current_index] = number;
+                y[current_index] = number;
             }
-            else if(number != ','){
-                (*X)[current_index][current_predictor] = number;
+            else{
+                X[current_index][current_predictor] = number;
                 current_predictor++;
             }
+
+            if(line_stream.peek() == ','){
+                line_stream.ignore();
+            }
+
         }
         current_index++;
     }
     samefile.close();
 
-    Dataset data = Dataset(*X,*y,length,number_predictor);
+    Dataset data = Dataset(X,y,length,number_predictor);
     return data;
 }
 
@@ -74,12 +80,12 @@ float mean(float *y, int length){
     return (total/length);
 }
 
-float sum_residual(float *x, float *y_true, float *y_pred, int length){
+float sum_residual(Dataset data, float *y_pred, int current_predictor){
     float total = 0;
     float residual;
-    for(int i = 0 ; i < length; i++){
-        residual = (y_pred[i] - y_true[i]);
-        total = total + residual*x[i];
+    for(int i = 0 ; i < data.length; i++){
+        residual = (y_pred[i] - data.y[i]);
+        total = total + residual*data.X[i][current_predictor];
     }
     return total;
 }
