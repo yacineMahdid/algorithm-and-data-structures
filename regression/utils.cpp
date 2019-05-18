@@ -1,103 +1,65 @@
 #include "utils.h"
 
-class Dataset{
-    public:
-        float **X;
-        float *y;
-        int number_predictor; //including intercept
-        int length;
-
-        Dataset(float **X_train,float *y_train, int length_train, int number_predictor_train){
-            X = (float **) malloc(sizeof(float*)*number_predictor);
-            for(int i = 0; i < number_predictor_train+1; i++){
-                X[i] = (float *) malloc(sizeof(float*)*length_train);
-                std::memcpy(X[i], X_train[i], sizeof(float)*length_train);
-            }
-
-            // Setting the first element to 1 (as it is the Intercept)
-            for(int i = 0; i < length_train; i++ ){
-                X[0][i] = 1;
-            }
-
-            y = (float *) malloc(sizeof(float)*length_train);
-            std::memcpy(y, y_train, sizeof(float)*length_train);
-            
-            length = length_train;
-            number_predictor = number_predictor_train+1;
-        }
-
-        ~Dataset(){
-            free(X);//Might need to free each malloc I did
-            free(y);
-        }
-};
-
-class Weights{
-    private:
-        int MAX_WEIGHTS;
-
-    public:
-        float* values;
-        int number_weights;
-        Weights(int number_predictor, int random_init){
-            // Random Init Variables
-            MAX_WEIGHTS = 100;
-            srand(time(0));  // random number generator
-
-            number_weights = number_predictor + 1; // +1 for the intercept
-            values = (float *) std::malloc(sizeof(float)*number_weights);
-            for(int i=0; i<number_weights; i++){
-                if(random_init){
-                    values[i] = (rand() % MAX_WEIGHTS);
-                }else{
-                    values[i] = 0;
-                }
-            }
-        }
-
-        ~Weights(){
-            free(values);
-        }
-
-        void update(Dataset data, float *y_pred, float learning_rate){
-            float multiplier = learning_rate/data.length;
-            // Update each weights
-            for(int i = 0; i < number_weights; i++){
-                values[i] = values[i] - multiplier*(sum_residual(data.X[i],data.y,y_pred,data.length));
-            }
-        }
-};
-
 
 // Misc Helper function 
-int read_csv(const char* filename, float **x, float **y){
+Dataset read_csv(const char* filename, float ***X, float **y){
     // Variable Initialization
     int index = 0;
     int length = 0;
+    int number_predictor = 0;
 
     // Reading File to get the number of x and y data points
     std::ifstream infile(filename);
     std::string line;
     while (std::getline(infile, line)){
         length++;
+        // Calculate the number of predictors
+        if(length == 1){
+            int i = 0;
+            while(line[i] != '\0'){
+                if(line[i] == ','){
+                    number_predictor++;
+                }
+            }
+        }
     }
     infile.close();
 
-    // Mallocating space for x and y
-    *x = (float *) std::malloc(sizeof(float)*length);
-    *y = (float *) std::malloc(sizeof(float)*length);
+    // Mallocating space for X and y
+    *X = (float **) malloc(sizeof(float*)*length);
+    for(int i = 0; i < length; i++){
+        *X[i] = (float *) malloc(sizeof(float*)*number_predictor);
+    }
+    *y = (float *) malloc(sizeof(float)*length);
+    
 
     // Rereading the file to extract x and y values
     char comma;
     std::ifstream samefile(filename);
+    int current_index;
     while(std::getline(samefile,line)){
+
         std::stringstream line_stream(line);
-        line_stream >> (*x)[index] >> comma >> (*y)[index];
-        index++;
+        int current_predictor = 0;
+        float number;
+        while (line_stream >> number)
+        {
+            if (line_stream.peek() == ','){
+                line_stream.ignore();
+            }else if(current_predictor == number_predictor){
+                *y[current_index] = number;
+            }
+            else{
+                *X[current_index][current_predictor] = number;
+                current_predictor++;
+            }
+        }
+        current_index++;
     }
     samefile.close();
 
-    return length;
+    Dataset data = Dataset(*X,*y,length,number_predictor);
+    return data;
 }
 
 int make_csv(const char* filename, float* weights, int number_weights, int number_simulation){

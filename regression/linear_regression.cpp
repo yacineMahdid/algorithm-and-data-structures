@@ -10,10 +10,10 @@ class LinearRegressionModel{
     // Public function for user
     public:
         // Constructor
-        LinearRegressionModel(float **X, float *y, int length_train, int number_predictor_train){
+        LinearRegressionModel(const Dataset &data_train){
             // Setting Variables
-            data = Dataset(X, y, length_train, number_predictor_train);
-            weights = Weights(number_predictor_train, 1);
+            data = Dataset(data_train);
+            weights = Weights(data.number_predictor, 1);
         }
 
         void print_weights(){
@@ -74,24 +74,27 @@ class LinearRegressionModel{
 
 int main(){
     // Variable Initialization
-    float *x_train;
-    float *y_train;
+    float **X;
+    float *y;
     int length_train;
     const char* filename = "test.csv";
-    length_train = read_csv(filename,&x_train,&y_train);
+    Dataset data = read_csv(filename,&X,&y);
 
     // Regression Variables
     int max_iteration = 1000;
     float learning_rate = 0.1;
 
     // Training
-    LinearRegressionModel linear_reg = LinearRegressionModel(x_train,y_train,length_train);
+    LinearRegressionModel linear_reg = LinearRegressionModel(data);
     linear_reg.train(max_iteration, learning_rate);
     
     // Testing
-    float x_test = 123; // Should give us 124 for y
-    float y_test = linear_reg.predict(x_test);
+    float X_test[2];
+    X_test[0] = 1;
+    X_test[1] = 123;
+    float y_test = linear_reg.predict(X_test);
     linear_reg.print_weights();
+    std::cout << "Testing for X0 = " << X_test[0] << ", X1 = " << X_test[1];
     std::cout << "y = " << y_test << "\n"; 
 
 }
