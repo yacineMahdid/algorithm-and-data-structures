@@ -1,53 +1,48 @@
 #include "utils.h"
 
 // Model class for MSE Linear Regression
+// Update: https://en.wikipedia.org/wiki/Linear_regression
 class LinearRegressionModel{
     // Models Variable
-    float *x;
-    float *y;
-    int length;
-    float *weights;
+    Dataset data;
+    Weights weights;
 
     // Public function for user
     public:
         // Constructor
-        LinearRegressionModel(float *x_train, float *y_train, int length_train){
+        LinearRegressionModel(float **X, float *y, int length_train, int number_predictor_train){
             // Setting Variables
-            x = (float *) malloc(sizeof(float)*length_train);
-            y = (float *) malloc(sizeof(float)*length_train);
-
-            std::memcpy(x, x_train, sizeof(float)*length_train);
-            std::memcpy(y, y_train, sizeof(float)*length_train);
-            length = length_train;
-            
-            // Initializing Weights to 0
-            weights = (float *) std::malloc(sizeof(float)*2);
-            weights[0] = 0; // intercept
-            weights[1] = 0; // slope
-        }
-
-        // Destructor
-        ~LinearRegressionModel(){
-            free(x);
-            free(y);
-            free(weights);
+            data = Dataset(X, y, length_train, number_predictor_train);
+            weights = Weights(number_predictor_train, 1);
         }
 
         void print_weights(){
-            std::cout << "y = " << weights[1] << "x + " << weights[0]  << "\n";
+            char function_string[1000];
+            strcpy(function_string, "y = ");
+            for(int i = 0; i < weights.number_weights; i++){
+                char weight[20];
+                sprintf(weight,"%.2f * x%d",weights.values[i],i);
+                strcat(function_string, weight);
+                if(i == weights.number_weights-1){
+                    strcat(function_string,"\n");
+                }else{
+                    strcat(function_string," + ");
+                }
+            }
+            std::cout << function_string;
         }
 
         // Train the regression model with some data
         void train(int max_iteration, float learning_rate){
 
             // Mallocating some space for prediction
-            float *y_pred = (float *) std::malloc(sizeof(float)*length);
+            float *y_pred = (float *) std::malloc(sizeof(float)*data.length);
 
             while(max_iteration > 0){
                 fit(y_pred);
-                update(y_pred, learning_rate);
+                weights.update(data, y_pred, learning_rate);
 
-                float mse = mean_squared_error(y_pred,y,length);
+                float mse = mean_squared_error(y_pred,data.y,data.length);
 
                 if(max_iteration % 100 == 0){
                     std::cout << "Iteration left: " << max_iteration << "; MSE = " << mse << "\n";
@@ -57,8 +52,12 @@ class LinearRegressionModel{
             free(y_pred);
         }
 
-        float predict(float x_test){
-            return weights[0] + weights[1]*x_test;
+        float predict(float *x){
+            float prediction = 0;
+                for(int i = 0; i < weights.number_weights; i++){
+                    prediction = prediction + weights.values[i]*x[i];
+                }
+            return prediction;
         }
 
     // Private function for algorithm
@@ -66,19 +65,9 @@ class LinearRegressionModel{
         // fit a line given some x and weights
         void fit(float *y_pred){
             
-            for(int i = 0; i < length; i++){
-                y_pred[i] = weights[0] + weights[1]*x[i];
+            for(int i = 0; i < data.length; i++){
+                y_pred[i] = predict(data.X[i]);
             }
-        }
-
-        // Update using Gradient Descent
-        void update(float *y_pred, float learning_rate){
-                    
-            float multiplier = 2*learning_rate/length;
-            // update the intercept
-            weights[0] = weights[0] - multiplier*(intercept_sum(y_pred,y,length));
-            // update the slope
-            weights[1] = weights[1] - multiplier*(slope_sum(x,y_pred,y,length));
         }
 };
 

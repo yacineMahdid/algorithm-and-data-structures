@@ -1,5 +1,74 @@
 #include "utils.h"
 
+class Dataset{
+    public:
+        float **X;
+        float *y;
+        int number_predictor; //including intercept
+        int length;
+
+        Dataset(float **X_train,float *y_train, int length_train, int number_predictor_train){
+            X = (float **) malloc(sizeof(float*)*number_predictor);
+            for(int i = 0; i < number_predictor_train+1; i++){
+                X[i] = (float *) malloc(sizeof(float*)*length_train);
+                std::memcpy(X[i], X_train[i], sizeof(float)*length_train);
+            }
+
+            // Setting the first element to 1 (as it is the Intercept)
+            for(int i = 0; i < length_train; i++ ){
+                X[0][i] = 1;
+            }
+
+            y = (float *) malloc(sizeof(float)*length_train);
+            std::memcpy(y, y_train, sizeof(float)*length_train);
+            
+            length = length_train;
+            number_predictor = number_predictor_train+1;
+        }
+
+        ~Dataset(){
+            free(X);//Might need to free each malloc I did
+            free(y);
+        }
+};
+
+class Weights{
+    private:
+        int MAX_WEIGHTS;
+
+    public:
+        float* values;
+        int number_weights;
+        Weights(int number_predictor, int random_init){
+            // Random Init Variables
+            MAX_WEIGHTS = 100;
+            srand(time(0));  // random number generator
+
+            number_weights = number_predictor + 1; // +1 for the intercept
+            values = (float *) std::malloc(sizeof(float)*number_weights);
+            for(int i=0; i<number_weights; i++){
+                if(random_init){
+                    values[i] = (rand() % MAX_WEIGHTS);
+                }else{
+                    values[i] = 0;
+                }
+            }
+        }
+
+        ~Weights(){
+            free(values);
+        }
+
+        void update(Dataset data, float *y_pred, float learning_rate){
+            float multiplier = learning_rate/data.length;
+            // Update each weights
+            for(int i = 0; i < number_weights; i++){
+                values[i] = values[i] - multiplier*(sum_residual(data.X[i],data.y,y_pred,data.length));
+            }
+        }
+};
+
+
 // Misc Helper function 
 int read_csv(const char* filename, float **x, float **y){
     // Variable Initialization
@@ -31,6 +100,10 @@ int read_csv(const char* filename, float **x, float **y){
     return length;
 }
 
+int make_csv(const char* filename, float* weights, int number_weights, int number_simulation){
+
+}
+
 // Stats Helper function
 float mean(float *y, int length){
     float total = 0;
@@ -38,6 +111,16 @@ float mean(float *y, int length){
         total = total + y[i];
     }
     return (total/length);
+}
+
+float sum_residual(float *x, float *y_true, float *y_pred, int length){
+    float total = 0;
+    float residual;
+    for(int i = 0 ; i < length; i++){
+        residual = (y_pred[i] - y_true[i]);
+        total = total + residual*x[i];
+    }
+    return total;
 }
 
 float sum_of_square(float *y, int length){
