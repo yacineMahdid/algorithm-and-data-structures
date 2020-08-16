@@ -1,9 +1,11 @@
-# Algorithms
+# Algorithm and Data Structures
 Implementation of common Algorithm
-Based on Foundations of Algorithms by Richard E. Neapolita fifth edition
-## Search
-1) Binary Search (iterative and recursive)
+Based on :
+- Foundations of Algorithms by Richard E. Neapolita fifth edition
+- COMP250 & COMP251 at McGill University
 
+## Algorithms
+- Binary Search (iterative and recursive)
 
-## To review
-1) Partial Derivative
+## Data Structure
+- Circular Linked List
